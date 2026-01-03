@@ -11,3 +11,5 @@ langchain-huggingface
 langgraph
 langchain-openai
 pytest
+duckduckgo-search 
+beautifulsoup4

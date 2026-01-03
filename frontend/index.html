@@ -123,6 +123,10 @@
             font-size: 0.95em;
             line-height: 1.4;
         }
+
+        .chat-message .content {
+            white-space: pre-line;  /* preserve backend \n line breaks */
+        }
         
         .chat-message.user { background: var(--primary); color: white; margin-left: auto; }
         .chat-message.mina { background: white; border: 1px solid #ddd; }
