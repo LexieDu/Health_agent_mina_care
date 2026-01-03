@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinaCare - Medicine Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-chat {
+            background: #10b981;
+        }
+        
+        .btn-chat:hover {
+            background: #059669;
+        }
+        
+        .medicine-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .medicine-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .medicine-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .medicine-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .medicine-details span {
+            display: block;
+        }
+        
+        .medicine-details strong {
+            color: #333;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        /* Chat Styles */
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chat-message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .chat-message.mina {
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .chat-message .sender {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+        
+        .chat-message.user .sender {
+            color: #e0e7ff;
+        }
+        
+        .chat-message.mina .sender {
+            color: #667eea;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .chat-input-area button {
+            padding: 12px 24px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .chat-input-area button:hover {
+            background: #059669;
+        }
+        
+        .chat-input-area button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💊 MinaCare</h1>
+            <p>Simple Medicine Management System with AI Chat</p>
+        </div>
+        
+        <div class="content">
+            <!-- Left: Add Medicine Form -->
+            <div class="card">
+                <h2>➕ Add Medicine</h2>
+                <div id="successMessage" class="success-message">
+                    Medicine added successfully!
+                </div>
+                <form id="addMedicineForm">
+                    <div class="form-group">
+                        <label>Medicine Name *</label>
+                        <input type="text" id="name" required placeholder="e.g., Aspirin">
+                    </div>
+                    <div class="form-group">
+                        <label>Dosage *</label>
+                        <input type="text" id="dosage" required placeholder="e.g., 500mg">
+                    </div>
+                    <div class="form-group">
+                        <label>Count *</label>
+                        <input type="number" id="count" required placeholder="e.g., 20" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Expiration Date *</label>
+                        <input type="date" id="expiration_date" required>
+                    </div>
+                    <button type="submit" class="btn">Add Medicine</button>
+                </form>
+            </div>
+
+            
+            <!-- Right: Medicine List -->
+            <div class="card">
+                <h2>📋 Medicine List</h2>
+                <div id="medicineList" class="medicine-list">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21,9H15V3H9V9H3V15H9V21H15V15H21V9Z" />
+                        </svg>
+                        <p>No medicines yet. Add your first medicine!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle: Chat with Mina -->
+            <div class="card">
+                <h2>💬 Chat with Mina</h2>
+                <div class="chat-box">
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="chat-message mina">
+                            <div class="sender">Mina</div>
+                            <div>Hi! I'm Mina, your health assistant. Tell me about your symptoms and I'll help you! 💙</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input 
+                            type="text" 
+                            id="chatInput" 
+                            placeholder="Tell me your symptoms..."
+                            onkeypress="if(event.key==='Enter') sendMessage()">
+                        <button onclick="sendMessage()" id="sendBtn">Send</button>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        // Load medicines on page load
+        loadMedicines();
+        
+        // Handle form submission
+        document.getElementById('addMedicineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const medicine = {
+                name: document.getElementById('name').value,
+                dosage: document.getElementById('dosage').value,
+                count: parseInt(document.getElementById('count').value),
+                expiration_date: document.getElementById('expiration_date').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/medicines`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(medicine)
+                });
+                
+                if (response.ok) {
+                    // Show success message
+                    const successMsg = document.getElementById('successMessage');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 3000);
+                    
+                    // Clear form
+                    document.getElementById('addMedicineForm').reset();
+                    
+                    // Reload medicine list
+                    loadMedicines();
+                } else {
+                    alert('Failed to add medicine');
+                }
+            } catch (error) {
+                alert('Error connecting to server. Make sure backend is running on port 8000.');
+                console.error('Error:', error);
+            }
+        });
+        
+        // Load medicines from API
+        async function loadMedicines() {
+            try {
+                const response = await fetch(`${API_BASE}/medicines`);
+                const medicines = await response.json();
+                
+                const listDiv = document.getElementById('medicineList');
+                
+                if (medicines.length === 0) {
+                    listDiv.innerHTML = `
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M21,9H15V3H9V9H3V15H9V21H15V15H21V9Z" />
+                            </svg>
+                            <p>No medicines yet. Add your first medicine!</p>
+                        </div>
+                    `;
+                } else {
+                    listDiv.innerHTML = medicines.map(med => `
+                        <div class="medicine-item">
+                            <h3>${med.name}</h3>
+                            <div class="medicine-details">
+                                <span><strong>Dosage:</strong> ${med.dosage}</span>
+                                <span><strong>Count:</strong> ${med.count}</span>
+                                <span><strong>Expires:</strong> ${med.expiration_date}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading medicines:', error);
+            }
+        }
+        
+        // Chat functionality
+        async function sendMessage() {
+            const input = document.getElementById("chatInput");
+            const chatMessages = document.getElementById("chatMessages");
+            
+            if (!chatMessages) return;
+            
+            // Disable send button
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            
+            // Add user message to chat
+            addMessageToChat('user', 'You', chatMessages);
+            
+            // Clear input
+            input.value = '';
+
+            // Show thinking state
+            const thinkingId = addMessageToChat(
+                'mina',
+                'Mina',
+                'Let me think about that for a moment… 🤍'
+            );
+            
+            try {
+                // Send to backend
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Add Mina's response
+                    updateMessage(thinkingId, data.reply);
+                } else {
+                    updateMessage(
+                        thinkingId,
+                        'Sorry, I had trouble understanding that. Please try again.'
+                    );
+                }
+            } catch (error) {
+                console.error('Chat error:', error);
+                updateMessage(
+                    thinkingId,
+                    'I can’t connect right now. Please try again in a moment. 💙'
+                );
+            } finally {
+                // Re-enable send button
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        function addMessageToChat(type, sender, message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            const id = 'msg-' + Date.now();
+
+            messageDiv.className = `chat-message ${type}`;
+            messageDiv.id = id;
+            messageDiv.innerHTML = `
+                <div class="sender">${sender}</div>
+                <div class="content">${message}</div>
+       `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return id;
+        }
+
+        function updateMessage(id, newText) {
+            const msg = document.getElementById(id);
+            if (!msg) return;
+            msg.querySelector('.content').innerHTML = newText;
+        }
+
+    </script>
+</body>
+</html>
