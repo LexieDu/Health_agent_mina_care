@@ -1,7 +1,8 @@
 # choose correct python env
-cd MinaCare
+cd Health-Agent-mina_care
 source venv/bin/activate
 pip install -r ./backend/requirements.txt
+python3 -m pip install -r ./backend/requirements.txt
 
 # Terminal 1 - Backend (restart to load new endpoint)
 cd backend
